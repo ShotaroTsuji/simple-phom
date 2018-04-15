@@ -1,0 +1,6 @@
+[package]
+name = "simple-phom"
+version = "0.1.0"
+authors = ["Shotaro Tsuji <Shotaro.Tsuji@gmail.com>"]
+
+[dependencies]
