@@ -1,5 +1,6 @@
 use simplex::Simplex;
-use z2vector::Z2Vector;
+use z2vector::Z2VectorRaw;
+use z2vector::Z2Boundary;
 use std::marker::PhantomData;
 use std::error;
 use std::fmt;
@@ -37,7 +38,8 @@ impl FilteredComplex {
         self.simplices.push(simplex);
     }
 
-    pub fn push(&mut self, simplex: Simplex) -> Result<Z2Vector, FilterError> {
+    pub fn push_raw(&mut self, simplex: Simplex)
+      -> Result<Z2VectorRaw, FilterError> {
         let mut indices = Vec::new();
 	for b in simplex.boundary() {
 	    match self.find_index(&b) {
@@ -45,9 +47,14 @@ impl FilteredComplex {
 		None => { return Err(FilterError); },
 	    }
 	}
-	let boundary = Z2Vector::from(indices);
+	let boundary = Z2VectorRaw::from(indices);
 	self.simplices.push(simplex);
 	Ok(boundary)
+    }
+
+    pub fn push(&mut self, simplex: Simplex) -> Result<Z2Boundary, FilterError> {
+        let dim = simplex.dimension();
+        self.push_raw(simplex).map(|v| Z2Boundary::new(v, dim))
     }
 
     pub fn find_index(&self, simplex: &Simplex) -> Option<usize> {

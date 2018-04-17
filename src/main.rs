@@ -3,6 +3,7 @@ extern crate simple_phom;
 use simple_phom::simplex::Simplex;
 use simple_phom::filteredcomplex::FilteredComplex;
 use simple_phom::z2vector::Z2Vector;
+use simple_phom::z2vector::Z2VectorRaw;
 use simple_phom::z2reduction;
 use simple_phom::z2reduction::Z2BoundaryMatrix;
 use simple_phom::z2reduction::Z2ReducedMatrix;
@@ -38,7 +39,7 @@ fn main() {
 
     println!("Boundary Matrix");
     for i in 0..boundary_matrix.ncols() {
-        println!("{:?}, lowest: {:?}", boundary_matrix.column(i), boundary_matrix.lowest(i));
+        println!("Boundary[{}] = {}", i, boundary_matrix.column(i));
     }
 
     println!("{}", Simplex::from(vec![0]) == Simplex::from(vec![0]));
@@ -51,15 +52,15 @@ fn main() {
 
     println!("simplex of index 4 in complex: {:?}", filtcomp.get(4));
 
-    let v1 = Z2Vector::zero();
+    let v1 = Z2VectorRaw::zero();
     println!("v1 = {:?}", v1);
     println!("lowest = {:?}", v1.lowest());
 
-    let v2 = Z2Vector::from(vec![0, 1, 2]);
+    let v2 = Z2VectorRaw::from(vec![0, 1, 2]);
     println!("v2 = {:?}", v2);
     println!("lowest = {:?}", v2.lowest());
 
-    let v3 = Z2Vector::from(vec![1, 2, 3]);
+    let v3 = Z2VectorRaw::from(vec![1, 2, 3]);
     println!("v3 = {:?}", v3);
     println!("lowest = {:?}", v3.lowest());
 
@@ -70,7 +71,7 @@ fn main() {
     println!("Reduce the boundary matrix");
     let reduced_matrix = z2reduction::reduce(boundary_matrix);
     for i in 0..reduced_matrix.ncols() {
-        println!("{:?}, lowest: {:?}", reduced_matrix.column(i), reduced_matrix.lowest(i));
+        println!("Boundary[{}] = {}", i, reduced_matrix.column(i));
     }
 
 }

@@ -1,12 +1,12 @@
 use z2vector::Z2Vector;
 
 #[derive(Debug)]
-pub struct Z2BoundaryMatrix {
-    columns: Vec<Z2Vector>,
+pub struct Z2BoundaryMatrix<C> where C: Z2Vector {
+    columns: Vec<C>,
 }
 
-impl Z2BoundaryMatrix {
-    pub fn new() -> Z2BoundaryMatrix {
+impl<C> Z2BoundaryMatrix<C> where C: Z2Vector {
+    pub fn new() -> Z2BoundaryMatrix<C> {
         Z2BoundaryMatrix { columns: Vec::new() }
     }
 
@@ -14,11 +14,11 @@ impl Z2BoundaryMatrix {
         self.columns.len()
     }
 
-    pub fn push(&mut self, col: Z2Vector) {
+    pub fn push(&mut self, col: C) {
         self.columns.push(col);
     }
 
-    pub fn column(&self, index: usize) -> &Z2Vector {
+    pub fn column(&self, index: usize) -> &C {
         self.columns.get(index).unwrap()
     }
 
@@ -28,16 +28,16 @@ impl Z2BoundaryMatrix {
 }
 
 #[derive(Debug)]
-pub struct Z2ReducedMatrix {
-    columns: Vec<Z2Vector>,
+pub struct Z2ReducedMatrix<C> where C: Z2Vector {
+    columns: Vec<C>,
 }
 
-impl Z2ReducedMatrix {
+impl<C> Z2ReducedMatrix<C> where C: Z2Vector {
     pub fn ncols(&self) -> usize {
         self.columns.len()
     }
 
-    pub fn column(&self, index: usize) -> &Z2Vector {
+    pub fn column(&self, index: usize) -> &C {
         self.columns.get(index).unwrap()
     }
 
@@ -73,7 +73,8 @@ impl Z2ReducedMatrix {
     }
 }
 
-pub fn reduce(boundary_matrix: Z2BoundaryMatrix) -> Z2ReducedMatrix {
+pub fn reduce<C>(boundary_matrix: Z2BoundaryMatrix<C>) -> Z2ReducedMatrix<C>
+  where C: Z2Vector {
     let mut rmat = Z2ReducedMatrix {
         columns: boundary_matrix.columns,
     };

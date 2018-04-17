@@ -7,6 +7,10 @@ pub struct Simplex {
 }
 
 impl Simplex {
+    pub fn dimension(&self) -> usize {
+        self.vertices.len() - 1
+    }
+
     pub fn boundary(&self) -> Boundary {
         Boundary {
 	    vertices: self.vertices.as_ref(),
