@@ -1,9 +1,9 @@
 use simplex::Simplex;
-use z2vector::Z2VectorRaw;
-use z2vector::Z2Boundary;
-use std::marker::PhantomData;
 use std::error;
 use std::fmt;
+use std::marker::PhantomData;
+use z2vector::Z2Boundary;
+use z2vector::Z2VectorRaw;
 
 #[derive(Debug)]
 pub struct FilterError;
@@ -24,32 +24,34 @@ impl error::Error for FilterError {
     }
 }
 
-
 pub struct FilteredComplex {
     simplices: Vec<Simplex>,
 }
 
 impl FilteredComplex {
     pub fn new() -> FilteredComplex {
-        FilteredComplex { simplices: Vec::new() }
+        FilteredComplex {
+            simplices: Vec::new(),
+        }
     }
 
     pub fn push_unchecked(&mut self, simplex: Simplex) {
         self.simplices.push(simplex);
     }
 
-    pub fn push_raw(&mut self, simplex: Simplex)
-      -> Result<Z2VectorRaw, FilterError> {
+    pub fn push_raw(&mut self, simplex: Simplex) -> Result<Z2VectorRaw, FilterError> {
         let mut indices = Vec::new();
-	for b in simplex.boundary() {
-	    match self.find_index(&b) {
-	        Some(index) => indices.push(index),
-		None => { return Err(FilterError); },
-	    }
-	}
-	let boundary = Z2VectorRaw::from(indices);
-	self.simplices.push(simplex);
-	Ok(boundary)
+        for b in simplex.boundary() {
+            match self.find_index(&b) {
+                Some(index) => indices.push(index),
+                None => {
+                    return Err(FilterError);
+                }
+            }
+        }
+        let boundary = Z2VectorRaw::from(indices);
+        self.simplices.push(simplex);
+        Ok(boundary)
     }
 
     pub fn push(&mut self, simplex: Simplex) -> Result<Z2Boundary, FilterError> {
@@ -58,25 +60,27 @@ impl FilteredComplex {
     }
 
     pub fn find_index(&self, simplex: &Simplex) -> Option<usize> {
-        self.simplices.iter().enumerate()
-	    .find(|pair| *pair.1 == *simplex)
-	    .map(|pair| pair.0)
+        self.simplices
+            .iter()
+            .enumerate()
+            .find(|pair| *pair.1 == *simplex)
+            .map(|pair| pair.0)
     }
 
     pub fn len(&self) -> usize {
         self.simplices.len()
     }
-    
+
     pub fn get(&self, index: usize) -> Option<&Simplex> {
         self.simplices.get(index)
     }
 
     pub fn iter(&self) -> Iter {
         Iter {
-	    simplices: self.simplices.as_ref(),
-	    index: 0,
-	    phantom: PhantomData,
-	}
+            simplices: self.simplices.as_ref(),
+            index: 0,
+            phantom: PhantomData,
+        }
     }
 }
 
@@ -91,11 +95,11 @@ impl<'a> Iterator for Iter<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.simplices.len() {
-	    let r = Some(&self.simplices[self.index]);
-	    self.index = self.index + 1;
-	    r
-	} else {
-	    None
-	}
+            let r = Some(&self.simplices[self.index]);
+            self.index = self.index + 1;
+            r
+        } else {
+            None
+        }
     }
 }

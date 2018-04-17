@@ -1,12 +1,9 @@
 extern crate simple_phom;
 
-use simple_phom::simplex::Simplex;
 use simple_phom::filteredcomplex::FilteredComplex;
-use simple_phom::z2vector::Z2Vector;
-use simple_phom::z2vector::Z2VectorRaw;
+use simple_phom::simplex::Simplex;
 use simple_phom::z2reduction;
 use simple_phom::z2reduction::Z2BoundaryMatrix;
-use simple_phom::z2reduction::Z2ReducedMatrix;
 
 fn print_boundary(simplex: &Simplex) {
     print!("The boundary of simplex {} = {{ ", simplex);
@@ -17,31 +14,7 @@ fn print_boundary(simplex: &Simplex) {
 }
 
 fn main() {
-    println!("Hello, world!");
-
-    let simplices = vec![
-        vec![0],   vec![1],   vec![2],   vec![3],
-	vec![0,1], vec![0,2], vec![1,3], vec![2,3], vec![1,2],
-	vec![0,1,2]
-    ];
-
-    let mut filtcomp = FilteredComplex::new();
-    let mut boundary_matrix = Z2BoundaryMatrix::new();
-
-    for simp in simplices.into_iter() {
-        let boundary = filtcomp.push(Simplex::from(simp)).unwrap();
-	boundary_matrix.push(boundary);
-    }
-
-    for s in filtcomp.iter() {
-        print_boundary(s);
-    }
-
-    println!("Boundary Matrix");
-    for i in 0..boundary_matrix.ncols() {
-        println!("Boundary[{}] = {}", i, boundary_matrix.column(i));
-    }
-
+    /*
     println!("{}", Simplex::from(vec![0]) == Simplex::from(vec![0]));
     println!("{}", Simplex::from(vec![0]) == Simplex::from(vec![1]));
     println!("{}", Simplex::from(vec![0]) == Simplex::from(vec![0,1]));
@@ -67,11 +40,47 @@ fn main() {
     println!("v1 + v2 = {:?}", v1.add(&v2));
     println!("v2 + v3 = {:?}", v2.add(&v3));
     println!("v2 + v2 = {:?}", v2.add(&v2));
+*/
+
+    let mut filtcomp = FilteredComplex::new();
+    let mut boundary_matrix = Z2BoundaryMatrix::new();
+
+    let simplices = vec![
+        vec![0],
+        vec![1],
+        vec![2],
+        vec![3],
+        vec![0, 1],
+        vec![0, 2],
+        vec![1, 3],
+        vec![2, 3],
+        vec![1, 2],
+        vec![0, 1, 2],
+    ];
+
+    for simp in simplices.into_iter() {
+        let boundary = filtcomp.push(Simplex::from(simp)).unwrap();
+        boundary_matrix.push(boundary);
+    }
+
+    for s in filtcomp.iter() {
+        print_boundary(s);
+    }
+
+    println!("Boundary Matrix");
+    for i in 0..boundary_matrix.ncols() {
+        println!("column[{}] = {}", i, boundary_matrix.column(i));
+    }
 
     println!("Reduce the boundary matrix");
     let reduced_matrix = z2reduction::reduce(boundary_matrix);
     for i in 0..reduced_matrix.ncols() {
-        println!("Boundary[{}] = {}", i, reduced_matrix.column(i));
+        println!("column[{}] = {}", i, reduced_matrix.column(i));
     }
 
+    let pair_iter = z2reduction::pairing(&reduced_matrix);
+
+    for pair in pair_iter {
+        println!("{:?}", pair);
+    }
 }

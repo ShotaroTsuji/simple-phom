@@ -1,4 +1,4 @@
-pub mod simplex;
 pub mod filteredcomplex;
-pub mod z2vector;
+pub mod simplex;
 pub mod z2reduction;
+pub mod z2vector;
