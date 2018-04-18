@@ -25,18 +25,39 @@ impl error::Error for FilterError {
 }
 
 pub struct FilteredComplex {
+    start: usize,
     simplices: Vec<Simplex>,
 }
 
 impl FilteredComplex {
     pub fn new() -> FilteredComplex {
         FilteredComplex {
+            start: 0,
             simplices: Vec::new(),
         }
     }
 
     pub fn push_unchecked(&mut self, simplex: Simplex) {
         self.simplices.push(simplex);
+    }
+
+    pub fn push_raw_with_prev(
+        &mut self,
+        prev: &FilteredComplex,
+        simplex: Simplex,
+    ) -> Result<Z2VectorRaw, FilterError> {
+        let mut indices = Vec::new();
+        for b in simplex.boundary() {
+            match prev.find_index(&b) {
+                Some(index) => indices.push(index),
+                None => {
+                    return Err(FilterError);
+                }
+            }
+        }
+        let boundary = Z2VectorRaw::from(indices);
+        self.simplices.push(simplex);
+        Ok(boundary)
     }
 
     pub fn push_raw(&mut self, simplex: Simplex) -> Result<Z2VectorRaw, FilterError> {
@@ -64,7 +85,7 @@ impl FilteredComplex {
             .iter()
             .enumerate()
             .find(|pair| *pair.1 == *simplex)
-            .map(|pair| pair.0)
+            .map(|pair| pair.0 + self.start)
     }
 
     pub fn len(&self) -> usize {
