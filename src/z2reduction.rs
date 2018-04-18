@@ -28,8 +28,8 @@ where
         self.columns.push(col);
     }
 
-    pub fn column(&self, index: usize) -> &C {
-        self.columns.get(index).unwrap()
+    pub fn get_column(&self, index: usize) -> Option<&C> {
+        self.columns.get(index)
     }
 
     pub fn lowest(&self, index: usize) -> Option<usize> {
@@ -57,12 +57,8 @@ where
         self.columns.get(index)
     }
 
-    pub fn column(&self, index: usize) -> &C {
-        self.columns.get(index).unwrap()
-    }
-
     pub fn lowest(&self, index: usize) -> Option<usize> {
-        self.columns.get(index).unwrap().lowest()
+        self.columns.get(index).and_then(|c| c.lowest())
     }
 
     fn add_left_to_right(&mut self, j1: usize, j2: usize) {
@@ -78,9 +74,8 @@ where
         *right = new;
     }
 
-    /* return the index of the column that has the same lowest value of
-       the given index and is younger than the given column */
-    fn find_same_lowest(&self, index: usize) -> Option<usize> {
+    /// Searches for a column that has the same lowest to the column of the given index.
+    fn position_of_same_lowest(&self, index: usize) -> Option<usize> {
         if let Some(low_i) = self.lowest(index) {
             for j in 0..index {
                 match self.lowest(j) {
@@ -94,9 +89,10 @@ where
         None
     }
 
-    fn find_by_lowest(&self, low: usize) -> Option<usize> {
+    /// Searches for a column that has the given lowest.
+    fn position_by_lowest(&self, low: usize) -> Option<usize> {
         for k in low..self.ncols() {
-            match self.column(k).lowest() {
+            match self.lowest(k) {
                 Some(low_k) if low_k == low => {
                     return Some(k);
                 }
@@ -115,7 +111,7 @@ where
         columns: boundary_matrix.columns,
     };
     for j in 0..rmat.ncols() {
-        while let Some(k) = rmat.find_same_lowest(j) {
+        while let Some(k) = rmat.position_of_same_lowest(j) {
             rmat.add_left_to_right(k, j);
         }
     }
@@ -160,7 +156,7 @@ where
             if chain.is_cycle() {
                 let j = self.index;
                 self.index += 1;
-                match self.matrix.find_by_lowest(j) {
+                match self.matrix.position_by_lowest(j) {
                     Some(k) => {
                         return Some(Persistence {
                             dimension: chain.chain_dim(),

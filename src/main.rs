@@ -69,13 +69,13 @@ fn main() {
 
     println!("Boundary Matrix");
     for i in 0..boundary_matrix.ncols() {
-        println!("column[{}] = {}", i, boundary_matrix.column(i));
+        println!("column[{}] = {}", i, boundary_matrix.get_column(i).unwrap());
     }
 
     println!("Reduce the boundary matrix");
     let reduced_matrix = z2reduction::reduce(boundary_matrix);
     for i in 0..reduced_matrix.ncols() {
-        println!("column[{}] = {}", i, reduced_matrix.column(i));
+        println!("column[{}] = {}", i, reduced_matrix.get_column(i).unwrap());
     }
 
     let pair_iter = z2reduction::pairing(&reduced_matrix);
