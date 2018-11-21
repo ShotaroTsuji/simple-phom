@@ -14,6 +14,7 @@ fn print_boundary(simplex: &Simplex) {
 }
 
 fn main() {
+    testcase1();
     /*
     println!("{}", Simplex::from(vec![0]) == Simplex::from(vec![0]));
     println!("{}", Simplex::from(vec![0]) == Simplex::from(vec![1]));
@@ -41,7 +42,9 @@ fn main() {
     println!("v2 + v3 = {:?}", v2.add(&v3));
     println!("v2 + v2 = {:?}", v2.add(&v2));
 */
+}
 
+fn testcase1() {
     let mut filtcomp = FilteredComplex::new();
     let mut boundary_matrix = Z2BoundaryMatrix::new();
 

@@ -11,8 +11,8 @@ impl Simplex {
         self.vertices.len() - 1
     }
 
-    pub fn boundary(&self) -> Boundary {
-        Boundary {
+    pub fn boundary(&self) -> BoundaryIter {
+        BoundaryIter {
             vertices: self.vertices.as_ref(),
             index: 0,
             phantom: PhantomData,
@@ -29,13 +29,13 @@ impl From<Vec<usize>> for Simplex {
     }
 }
 
-pub struct Boundary<'a> {
+pub struct BoundaryIter<'a> {
     vertices: &'a [usize],
     index: usize,
     phantom: PhantomData<&'a usize>,
 }
 
-impl<'a> Iterator for Boundary<'a> {
+impl<'a> Iterator for BoundaryIter<'a> {
     type Item = Simplex;
 
     fn next(&mut self) -> Option<Self::Item> {

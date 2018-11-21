@@ -60,6 +60,15 @@ impl FilteredComplex {
         Ok(boundary)
     }
 
+    pub fn push_with_prev(
+        &mut self,
+	prev: &FilteredComplex,
+	simplex: Simplex
+    ) -> Result<Z2Boundary, FilterError> {
+        let dim = simplex.dimension();
+        self.push_raw_with_prev(prev, simplex).map(|v| Z2Boundary::new(v, dim))
+    }
+
     pub fn push_raw(&mut self, simplex: Simplex) -> Result<Z2VectorRaw, FilterError> {
         let mut indices = Vec::new();
         for b in simplex.boundary() {

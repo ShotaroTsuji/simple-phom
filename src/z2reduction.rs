@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
-use z2vector::Chain;
 use z2vector::Z2Vector;
+use z2vector::{ChainDim, IsCycle};
 
 #[derive(Debug)]
 pub struct Z2BoundaryMatrix<C>
@@ -120,34 +120,39 @@ where
 
 #[derive(Debug)]
 pub struct Persistence {
+    birth: usize,
+    death: Option<usize>,
+}
+
+pub struct PersistenceWithDimension {
     dimension: usize,
     birth: usize,
     death: Option<usize>,
 }
 
-pub fn pairing<'a, C>(reduced_matrix: &'a Z2ReducedMatrix<C>) -> PersistencePairing<'a, C>
+pub fn pairing<'a, C>(reduced_matrix: &'a Z2ReducedMatrix<C>) -> Pairing<'a, C>
 where
-    C: 'a + Z2Vector + Chain,
+    C: 'a + Z2Vector + IsCycle,
 {
-    PersistencePairing {
+    Pairing {
         matrix: reduced_matrix,
         index: 0,
         phantom: PhantomData,
     }
 }
 
-pub struct PersistencePairing<'a, C>
+pub struct Pairing<'a, C>
 where
-    C: 'a + Z2Vector + Chain,
+    C: 'a + Z2Vector + IsCycle,
 {
     matrix: &'a Z2ReducedMatrix<C>,
     index: usize, // index of column that will be processed in next calling
     phantom: PhantomData<&'a Z2ReducedMatrix<C>>,
 }
 
-impl<'a, C> Iterator for PersistencePairing<'a, C>
+impl<'a, C> Iterator for Pairing<'a, C>
 where
-    C: 'a + Z2Vector + Chain,
+    C: 'a + Z2Vector + IsCycle,
 {
     type Item = Persistence;
 
@@ -159,14 +164,12 @@ where
                 match self.matrix.position_by_lowest(j) {
                     Some(k) => {
                         return Some(Persistence {
-                            dimension: chain.chain_dim(),
                             birth: j,
                             death: Some(k),
                         });
                     }
                     None => {
                         return Some(Persistence {
-                            dimension: chain.chain_dim(),
                             birth: j,
                             death: None,
                         });
@@ -177,4 +180,24 @@ where
         }
         None
     }
+}
+
+pub fn pairing_with_dimension<'a, C>(
+    reduced_matrix: &'a Z2ReducedMatrix<C>,
+) -> PairingWithDimension<'a, C>
+where
+    C: 'a + Z2Vector + IsCycle + ChainDim,
+{
+    PairingWithDimension {
+        parent: pairing(reduced_matrix),
+        phantom: PhantomData,
+    }
+}
+
+pub struct PairingWithDimension<'a, C>
+where
+    C: 'a + Z2Vector + IsCycle + ChainDim,
+{
+    parent: Pairing<'a, C>,
+    phantom: PhantomData<&'a Z2ReducedMatrix<C>>,
 }

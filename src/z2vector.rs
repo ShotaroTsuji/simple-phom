@@ -5,8 +5,11 @@ pub trait Z2Vector<T = Self> {
     fn add(&self, right: &T) -> T;
 }
 
-pub trait Chain {
+pub trait IsCycle {
     fn is_cycle(&self) -> bool;
+}
+
+pub trait ChainDim {
     fn chain_dim(&self) -> usize;
 }
 
@@ -62,6 +65,12 @@ impl Z2Vector for Z2VectorRaw {
     }
 }
 
+impl IsCycle for Z2VectorRaw {
+    fn is_cycle(&self) -> bool {
+        self.elements.len() == 0
+    }
+}
+
 impl From<Vec<usize>> for Z2VectorRaw {
     fn from(vec_: Vec<usize>) -> Z2VectorRaw {
         let mut vec = vec_;
@@ -96,12 +105,15 @@ impl Z2Boundary {
     }
 }
 
-impl Chain for Z2Boundary {
+impl ChainDim for Z2Boundary {
     fn chain_dim(&self) -> usize {
         self.chain_dim
     }
+}
+
+impl IsCycle for Z2Boundary {
     fn is_cycle(&self) -> bool {
-        self.vector.lowest().is_none()
+        self.vector.is_cycle()
     }
 }
 
